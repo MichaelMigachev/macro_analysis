@@ -1,0 +1,7 @@
+tabulate
+pytest
+pytest-cov
+flake8
+pandas
+numpy
+
