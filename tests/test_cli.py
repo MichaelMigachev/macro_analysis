@@ -13,7 +13,6 @@ class TestCLI:
 
     def test_main_success_with_valid_data(self, tmp_path):
         """Test successful execution with valid data."""
-        # Create test CSV file
         test_file = tmp_path / "test.csv"
         test_file.write_text("""country,year,gdp,gdp_growth,inflation,unemployment,population,continent
 USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
@@ -29,7 +28,6 @@ USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
 
     def test_main_with_multiple_files(self, tmp_path):
         """Test with multiple CSV files."""
-        # Create test files
         file1 = tmp_path / "file1.csv"
         file1.write_text("country,gdp\nUSA,100\n", encoding='utf-8')
 
@@ -100,13 +98,12 @@ USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
             with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
                 main()
                 output = mock_stdout.getvalue()
-                # Пустой вывод или пустая строка
                 assert output == '' or output == '\n' or 'Страна' in output
 
     def test_main_with_malformed_csv(self, tmp_path):
         """Test with malformed CSV file."""
         malformed_file = tmp_path / "malformed.csv"
-        malformed_file.write_text("country,gdp\nUSA\n", encoding='utf-8')  # Missing gdp value
+        malformed_file.write_text("country,gdp\nUSA\n", encoding='utf-8')
 
         test_args = ['program.py', '--files', str(malformed_file), '--report', 'average-gdp']
 
@@ -114,8 +111,7 @@ USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
             with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
                 main()
                 output = mock_stdout.getvalue()
-                # Может быть ошибка или пустой вывод
-                assert output != ''  # Проверяем, что что-то выводится
+                assert output != ''
 
     def test_main_with_unicode_data(self, tmp_path):
         """Test with Unicode characters in data."""
@@ -206,7 +202,6 @@ USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
             with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
                 main()
                 output = mock_stdout.getvalue()
-                # Пустой вывод или пустая строка
                 assert output == '' or output == '\n' or 'Страна' in output
 
     def test_main_with_different_encodings(self, tmp_path):
@@ -215,7 +210,6 @@ USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
         utf8_file = tmp_path / "utf8.csv"
         utf8_file.write_text("country,gdp\nUSA,100\n", encoding='utf-8')
 
-        # CP1251 file (Russian Windows)
         cp1251_file = tmp_path / "cp1251.csv"
         cp1251_file.write_text("country,gdp\nРФ,200\n", encoding='cp1251')
 
@@ -225,7 +219,6 @@ USA,2023,100,1.0,2.0,3.0,100,NA""", encoding='utf-8')
             with patch('sys.stdout', new_callable=StringIO) as mock_stdout:
                 main()
                 output = mock_stdout.getvalue()
-                # Должна быть ошибка о кодировке
                 assert 'Ошибка' in output or 'codec' in output or 'encoding' in output.lower()
 
 

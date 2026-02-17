@@ -32,7 +32,6 @@ Germany,2023,4086,-0.3,6.2,3.0,83,Europe"""
         file1 = tmp_path / "data1.csv"
         file1.write_text(sample_csv_content, encoding='utf-8')
 
-        # Create second file with additional data
         file2 = tmp_path / "data2.csv"
         file2.write_text("""country,year,gdp,gdp_growth,inflation,unemployment,population,continent
 France,2023,3049,0.9,5.2,7.1,68,Europe
@@ -65,10 +64,8 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
         loader = DataLoader()
         result = loader.load_files(temp_csv_files)
 
-        # Should have 5 + 2 = 7 rows
         assert len(result) == 7
 
-        # Check that data from both files is present
         countries = {row['country'] for row in result}
         assert 'United States' in countries
         assert 'China' in countries
@@ -84,7 +81,6 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
         loader = DataLoader()
         result = loader.load_files([str(empty_file)])
 
-        # Empty file with no headers should return empty list
         assert result == []
 
     def test_load_file_with_headers_only(self, tmp_path, sample_csv_content_with_headers_only):
@@ -95,7 +91,6 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
         loader = DataLoader()
         result = loader.load_files([str(test_file)])
 
-        # Should return empty list (headers but no data rows)
         assert result == []
 
     def test_file_not_found(self):
@@ -110,13 +105,11 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
 
     def test_load_files_with_mixed_existence(self, tmp_path):
         """Test loading mix of existing and non-existing files."""
-        # Create one valid file
         valid_file = tmp_path / "valid.csv"
         valid_file.write_text("country,gdp\nUSA,100\n", encoding='utf-8')
 
         loader = DataLoader()
 
-        # Should raise FileNotFoundError on the first missing file
         with pytest.raises(FileNotFoundError) as exc_info:
             loader.load_files([str(valid_file), "nonexistent.csv"])
 
@@ -136,16 +129,14 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
 
     def test_load_file_with_different_delimiters(self, tmp_path):
         """Test that csv.DictReader handles different delimiters correctly."""
-        # csv.DictReader defaults to comma, so we're testing that it works with commas
         test_file = tmp_path / "test.csv"
-        test_file.write_text("country;gdp\nUSA;100\n", encoding='utf-8')  # Semicolon delimiter
+        test_file.write_text("country;gdp\nUSA;100\n", encoding='utf-8')
 
         loader = DataLoader()
         result = loader.load_files([str(test_file)])
 
-        # Should treat the whole line as one field because of wrong delimiter
         assert len(result) == 1
-        assert 'country;gdp' in result[0]  # Headers will be treated as data
+        assert 'country;gdp' in result[0]
 
     def test_load_file_with_extra_spaces(self, tmp_path):
         """Test loading CSV with extra spaces in values."""
@@ -155,11 +146,10 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
         loader = DataLoader()
         result = loader.load_files([str(test_file)])
 
-        # Spaces should be preserved as they are part of the values
         assert len(result) == 2
         assert result[0]['country'] == 'USA'
-        assert result[0][' gdp'] == ' 100'  # Note the space in key and value
-        assert result[1]['country'] == ' Germany'  # Leading space preserved
+        assert result[0][' gdp'] == ' 100'
+        assert result[1]['country'] == ' Germany'
 
     def test_load_file_with_quoted_values(self, tmp_path):
         """Test loading CSV with quoted values."""
@@ -172,7 +162,7 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
         assert len(result) == 2
         assert result[0]['country'] == 'United States'
         assert result[0]['gdp'] == '100'
-        assert result[1]['country'] == 'Germany, EU'  # Comma inside quotes preserved
+        assert result[1]['country'] == 'Germany, EU'
         assert result[1]['gdp'] == '200'
 
     def test_load_file_with_malformed_csv(self, tmp_path):
@@ -182,11 +172,8 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
 
         loader = DataLoader()
 
-        # csv.DictReader will handle malformed rows by putting extra data in a single field
-        # This shouldn't raise an exception
         result = loader.load_files([str(test_file)])
 
-        # First row has 3 fields, so the last one might be in a field with key None or extra
         assert len(result) == 2
 
     @patch('builtins.open', side_effect=PermissionError("Permission denied"))
@@ -217,12 +204,11 @@ Japan,2023,4231,1.2,2.8,2.6,125,Asia""", encoding='utf-8')
     def test_load_files_returns_list_of_dicts(self, temp_csv_files):
         """Test that returned data structure is correct."""
         loader = DataLoader()
-        result = loader.load_files(temp_csv_files[:1])  # Use first file only
+        result = loader.load_files(temp_csv_files[:1])
 
         assert isinstance(result, list)
         assert all(isinstance(row, dict) for row in result)
 
-        # Check that all rows have the same keys (from headers)
         if result:
             first_row_keys = set(result[0].keys())
             for row in result[1:]:

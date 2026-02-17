@@ -23,7 +23,6 @@ class TestReportRegistry:
         # Existing report
         assert ReportRegistry.get_report('average-gdp') == AverageGDPReport
 
-        # Nonexistent reports
         assert ReportRegistry.get_report('') is None
         assert ReportRegistry.get_report('gdp-average') is None
         assert ReportRegistry.get_report('test') is None
@@ -39,7 +38,6 @@ class TestReportRegistry:
         """Test that _reports dictionary can be accessed but not accidentally modified."""
         original_reports = ReportRegistry._reports.copy()
 
-        # Try to modify through get_report (should not modify)
         ReportRegistry.get_report('average-gdp')
 
         assert ReportRegistry._reports == original_reports
@@ -50,7 +48,6 @@ class TestReportRegistry:
         assert report_class == AverageGDPReport
         assert not isinstance(report_class, AverageGDPReport)
 
-        # Check that it's a class (can be instantiated)
         instance = report_class([])
         assert isinstance(instance, AverageGDPReport)
 
@@ -59,13 +56,13 @@ class TestReportRegistry:
         first_call = ReportRegistry.get_report('average-gdp')
         second_call = ReportRegistry.get_report('average-gdp')
 
-        assert first_call is second_call  # Same object reference
+        assert first_call is second_call
 
     @pytest.mark.parametrize("report_name,expected", [
         ('average-gdp', AverageGDPReport),
-        ('AVERAGE-GDP', None),  # Case-sensitive
-        ('Average-Gdp', None),  # Case-sensitive
-        (' average-gdp ', None),  # Spaces not trimmed
+        ('AVERAGE-GDP', None),
+        ('Average-Gdp', None),
+        (' average-gdp ', None),
     ])
     def test_get_report_case_sensitivity(self, report_name, expected):
         """Test that report names are case-sensitive."""
@@ -82,7 +79,7 @@ class TestReportRegistry:
         for report_name, report_class in ReportRegistry._reports.items():
             assert isinstance(report_class, type)  # Check it's a class
             assert hasattr(report_class, '__init__')  # Has constructor
-            assert hasattr(report_class, 'generate') or hasattr(report_class, 'process')  # Has expected methods
+            assert hasattr(report_class, 'generate') or hasattr(report_class, 'process')
 
     def test_get_report_with_none_input(self):
         """Test get_report with None as input."""
@@ -91,15 +88,11 @@ class TestReportRegistry:
 
     def test_get_report_with_non_string_input(self):
         """Test get_report with non-string input."""
-    # Словари и списки нельзя использовать как ключи в словаре,
-    # поэтому они вызовут TypeError при попытке поиска
     with pytest.raises(TypeError):
         ReportRegistry.get_report([])
 
     with pytest.raises(TypeError):
         ReportRegistry.get_report({})
 
-    # Числа и булевы значения преобразуются в ключи,
-    # но таких ключей нет в словаре, поэтому вернется None
     assert ReportRegistry.get_report(123) is None
     assert ReportRegistry.get_report(True) is None

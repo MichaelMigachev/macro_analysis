@@ -5,7 +5,7 @@
 ## Установка
 #### 1. Клонируйте репозиторий
  
-git clone <https://github.com/MichaelMigachev/macro_analysis.git>
+https://github.com/MichaelMigachev/macro_analysis.git
 
 #### 2. Создайте и активируйте виртуальное окружение
  

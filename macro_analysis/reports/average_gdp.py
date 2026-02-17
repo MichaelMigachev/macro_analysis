@@ -17,14 +17,12 @@ class AverageGDPReport:
         gdp_data = defaultdict(list)
 
         for row in self.data:
-            # Проверяем наличие обоих ключей
             if not isinstance(row, dict):
                 continue
 
             if 'country' not in row or 'gdp' not in row:
                 continue
 
-            # Пропускаем None или пустые значения
             if row['gdp'] is None or row['gdp'] == '':
                 continue
 
@@ -32,10 +30,8 @@ class AverageGDPReport:
                 gdp = float(row['gdp'])
                 gdp_data[row['country']].append(gdp)
             except (ValueError, TypeError):
-                # Пропускаем некорректные значения
                 continue
 
-        # Если нет данных, возвращаем пустой список
         if not gdp_data:
             return []
 
