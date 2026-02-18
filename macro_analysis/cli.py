@@ -22,7 +22,17 @@ def main():
         report = report_cls(data)
         result = report.generate()
 
-        print(tabulate.tabulate(result, headers='keys', tablefmt='grid'))
+        # Добавляем нумерацию строк
+        numbered_result = []
+        for idx, row in enumerate(result, 1):
+            numbered_row = {'№': idx, **row}
+            # Заменяем None на "Н/Д" для отображения
+            if numbered_row['Средний ВВП'] is None:
+                numbered_row['Средний ВВП'] = "Н/Д"
+            numbered_result.append(numbered_row)
+
+        # Выводим с нумерацией
+        print(tabulate.tabulate(numbered_result, headers='keys', tablefmt='grid'))
 
     except Exception as e:
         print(f"Ошибка: {str(e)}")
